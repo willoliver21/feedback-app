@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Formulário de Feedback</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <style>
+    /* Reset básico */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      min-height: 100vh;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      background: white;
+      padding: 2rem 3rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h2 {
+      margin-bottom: 1.5rem;
+      color: #333;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.4rem;
+      font-weight: 600;
+      color: #555;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"] {
+      width: 100%;
+      padding: 0.5rem 0.7rem;
+      margin-bottom: 1rem;
+      border: 1.5px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    input[type="date"]:focus {
+      outline: none;
+      border-color: #0078d7;
+      box-shadow: 0 0 6px #0078d7aa;
+    }
+
+    button {
+      width: 100%;
+      background-color: #0078d7;
+      color: white;
+      padding: 0.7rem;
+      border: none;
+      border-radius: 5px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #005fa3;
+    }
+
+    /* Mensagem de sucesso */
+    #msg-sucesso {
+      color: green;
+      font-weight: 600;
+      margin-top: 1rem;
+      text-align: center;
+      display: none;
+    }
+
+    /* Mensagem de erro */
+    #msg-erro {
+      color: #cc3300;
+      font-weight: 600;
+      margin-top: 1rem;
+      text-align: center;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Formulário de Feedback</h2>
+    <form id="feedback-form" novalidate>
+      <label for="nome">Nome:</label>
+      <input type="text" id="nome" name="nome" placeholder="Seu nome" required />
+
+      <label for="nota">Nota (0 a 5):</label>
+      <input type="number" id="nota" name="nota" min="0" max="5" step="0.1" placeholder="Sua nota" required />
+
+      <label for="data">Data:</label>
+      <input type="date" id="data" name="data" required />
+
+      <button type="submit">Enviar</button>
+    </form>
+
+    <div id="msg-sucesso">Feedback enviado com sucesso!</div>
+    <div id="msg-erro"></div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://koephgpqguzxqchxsrlp.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtvZXBoZ3BxZ3V6eHFjaHhzcmxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAwODUwNDksImV4cCI6MjA2NTY2MTA0OX0.LiSgIqsCNafhUXd5RqU42LHcf_fhXznOb13y-aP-clk';
+
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const form = document.getElementById('feedback-form');
+    const msgSucesso = document.getElementById('msg-sucesso');
+    const msgErro = document.getElementById('msg-erro');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      msgSucesso.style.display = 'none';
+      msgErro.style.display = 'none';
+
+      const nome = form.nome.value.trim();
+      const nota = parseFloat(form.nota.value);
+      const data = form.data.value;
+
+      if (!nome || isNaN(nota) || nota < 0 || nota > 5 || !data) {
+        msgErro.textContent = 'Por favor, preencha todos os campos corretamente. Nota deve ser entre 0 e 5.';
+        msgErro.style.display = 'block';
+        return;
+      }
+
+      const { data: inserted, error } = await supabaseClient
+        .from('feedbacks')
+        .insert([{ nome, nota, data }]);
+
+      if (error) {
+        msgErro.textContent = 'Erro ao enviar feedback: ' + error.message;
+        msgErro.style.display = 'block';
+        console.error(error);
+      } else {
+        msgSucesso.style.display = 'block';
+        form.reset();
+      }
+    });
+  </script>
+</body>
+</html>
