@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Feedback de Atendimento</title>
+  <title>Feedback de Serviços</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f2f2f7;
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
       margin: 0;
       padding: 0;
       display: flex;
@@ -20,64 +20,64 @@
       background: white;
       padding: 2rem;
       border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
-      max-width: 500px;
-      width: 90%;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+      max-width: 420px;
+      width: 100%;
     }
 
-    h1 {
-      font-size: 1.5rem;
-      margin-bottom: 1.5rem;
+    h2 {
       text-align: center;
+      margin-bottom: 1.5rem;
+      color: #333;
     }
 
     label {
-      font-weight: 600;
-      margin-top: 1rem;
       display: block;
+      margin-top: 1rem;
+      margin-bottom: 0.25rem;
+      font-weight: bold;
     }
 
-    input[type="number"],
-    textarea {
+    input, textarea, select {
       width: 100%;
-      padding: 0.75rem;
-      margin-top: 0.5rem;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
+      padding: 0.5rem;
       font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
     }
 
     textarea {
       resize: vertical;
-      height: 100px;
+      min-height: 80px;
     }
 
     button {
-      background: #4CAF50;
-      color: white;
-      border: none;
-      padding: 0.75rem 1rem;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 1.5rem;
       width: 100%;
+      margin-top: 1.5rem;
+      padding: 0.75rem;
+      background-color: #007bff;
+      border: none;
+      color: white;
       font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
     }
 
     button:hover {
-      background: #45a049;
+      background-color: #0056b3;
     }
 
-    .mensagem {
+    .status {
       margin-top: 1rem;
       text-align: center;
+      font-size: 0.9rem;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Deixe seu feedback</h1>
+    <h2>Feedback do Serviço</h2>
 
     <label for="notaAtendimento">Nota do atendimento (1 a 5):</label>
     <input type="number" id="notaAtendimento" min="1" max="5" required />
@@ -85,49 +85,51 @@
     <label for="notaValor">Nota do valor cobrado (1 a 5):</label>
     <input type="number" id="notaValor" min="1" max="5" required />
 
-    <label for="comentario">Comentário:</label>
-    <textarea id="comentario" placeholder="Deu tudo certo? Algo a melhorar?"></textarea>
+    <label for="comentario">Comentário (opcional):</label>
+    <textarea id="comentario" placeholder="Escreva aqui..."></textarea>
 
     <button onclick="enviarFeedback()">Enviar Feedback</button>
-    <div class="mensagem" id="mensagem"></div>
+    <div class="status" id="status"></div>
   </div>
 
   <script type="module">
-    import { createClient } from "https://esm.sh/@supabase/supabase-js";
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-    const supabaseUrl = "https://koephgpqguzxqchxsrlp.supabase.co";
-    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtvZXBoZ3BxZ3V6eHFjaHhzcmxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAwODUwNDksImV4cCI6MjA2NTY2MTA0OX0.LiSgIqsCNafhUXd5RqU42LHcf_fhXznOb13y-aP-clk"; // Substitua pela real
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabaseUrl = 'https://koephgpqguzxqchxsrlp.supabase.co'
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtvZXBoZ3BxZ3V6eHFjaHhzcmxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAwODUwNDksImV4cCI6MjA2NTY2MTA0OX0.LiSgIqsCNafhUXd5RqU42LHcf_fhXznOb13y-aP-clk'
+    const supabase = createClient(supabaseUrl, supabaseKey)
 
-    async function enviarFeedback() {
-      const notaAtendimento = parseInt(document.getElementById("notaAtendimento").value);
-      const notaValor = parseInt(document.getElementById("notaValor").value);
-      const comentario = document.getElementById("comentario").value;
-      const mensagem = document.getElementById("mensagem");
+    window.enviarFeedback = async function () {
+      const status = document.getElementById('status');
+      status.textContent = 'Enviando...';
 
-      // Validação simples
-      if (!notaAtendimento || !notaValor || notaAtendimento < 1 || notaAtendimento > 5 || notaValor < 1 || notaValor > 5) {
-        mensagem.textContent = "As notas devem estar entre 1 e 5.";
-        mensagem.style.color = "red";
-        return;
+      const notaAtendimento = parseInt(document.getElementById('notaAtendimento').value)
+      const notaValor = parseInt(document.getElementById('notaValor').value)
+      const comentario = document.getElementById('comentario').value
+
+      if (
+        isNaN(notaAtendimento) || notaAtendimento < 1 || notaAtendimento > 5 ||
+        isNaN(notaValor) || notaValor < 1 || notaValor > 5
+      ) {
+        status.textContent = 'As notas devem estar entre 1 e 5.'
+        return
       }
 
-      const { error } = await supabase.from("feedbacks").insert({
-        nota_atendimento: notaAtendimento,
-        nota_valor: notaValor,
-        comentario: comentario
-      });
+      const { error } = await supabase.from('feedbacks').insert([
+        {
+          nota_atendimento: notaAtendimento,
+          nota_valor: notaValor,
+          comentario: comentario
+        }
+      ])
 
       if (error) {
-        console.error("Erro ao enviar feedback:", error.message);
-        mensagem.textContent = "Erro ao enviar. Tente novamente.";
-        mensagem.style.color = "red";
+        status.textContent = 'Erro ao enviar feedback: ' + error.message
       } else {
-        mensagem.textContent = "Obrigado pelo seu feedback!";
-        mensagem.style.color = "green";
-        document.getElementById("notaAtendimento").value = "";
-        document.getElementById("notaValor").value = "";
-        document.getElementById("comentario").value = "";
+        status.textContent = '✅ Feedback enviado com sucesso!'
+        document.getElementById('notaAtendimento').value = ''
+        document.getElementById('notaValor').value = ''
+        document.getElementById('comentario').value = ''
       }
     }
   </script>
