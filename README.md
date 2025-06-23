@@ -30,7 +30,7 @@ Este é um projeto simples e funcional desenvolvido para coletar **feedbacks de 
 ## 🧪 Como testar
 
 1.  **Enviar Feedback**
-    - Acesse: [https://feedback-app-willoliver21.vercel.app/](https://feedback-app-willoliver21.vercel.app/)
+    - Acesse: [https://feedback-app-azure-delta.vercel.app/](https://feedback-app-azure-delta.vercel.app/)
     - Preencha:
         - Nome do profissional avaliado
         - Nota da qualidade do serviço (1 a 5)
